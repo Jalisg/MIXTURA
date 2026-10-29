@@ -1,0 +1,58 @@
+﻿@model MIXTURAA.Models.Ingrediente
+
+@{
+    ViewData["Title"] = "Agregar Nuevo Insumo";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4" style="background-color: #FFF9F2; border-radius: 12px;">
+                <h3 class="fw-bold mb-3" style="color: #6B2638;">🧂 REGISTRAR NUEVO INSUMO</h3>
+                <p class="text-muted small">Ingresa los datos de la materia prima para calcular su costo unitario automático.</p>
+
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label fw-bold">Nombre del Insumo</label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej. Harina de Trigo, Huevos, Cacao" required />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="CantidadPresentacion" class="form-label fw-bold">Cantidad de Presentación</label>
+                        <input asp-for="CantidadPresentacion" type="number" step="0.01" class="form-control" placeholder="Ej. 1000, 12, 250" required />
+                        <span asp-validation-for="CantidadPresentacion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UnidadMedida" class="form-label fw-bold">Unidad de Medida</label>
+                        <select asp-for="UnidadMedida" class="form-select" required>
+                            <option value="">-- Seleccionar Unidad --</option>
+                            <option value="Gramos">Gramos</option>
+                            <option value="Mililitros">Mililitros</option>
+                            <option value="Unidades">Unidades</option>
+                        </select>
+                        <span asp-validation-for="UnidadMedida" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="PrecioCompra" class="form-label fw-bold">Precio de Compra (C$)</label>
+                        <input asp-for="PrecioCompra" type="number" step="0.01" class="form-control" placeholder="Ej. 35.00" required />
+                        <span asp-validation-for="PrecioCompra" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn text-white fw-bold" style="background-color: #6B2638;">Guardar Insumo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

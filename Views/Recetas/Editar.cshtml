@@ -1,0 +1,262 @@
+﻿@model MIXTURAA.Models.Receta
+
+@{
+    ViewData["Title"] = "Editar Receta";
+    var ingredientes = ViewBag.Ingredientes as List<MIXTURAA.Models.Ingrediente> ?? new List<MIXTURAA.Models.Ingrediente>();
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0" style="color: #6B2638;">✏️ EDITAR RECETA Y COSTOS</h2>
+        <a asp-action="MisRecetas" class="btn btn-outline-secondary">← Volver a Mis Recetas</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm p-4" style="background-color: #FFF9F2;">
+                <input type="hidden" id="recetaId" value="@Model.Id" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nombre de la Receta</label>
+                    <input type="text" id="nombreReceta" class="form-control" value="@Model.Nombre" />
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Molde / Presentación</label>
+                        <input type="text" id="moldeReceta" class="form-control" value="@Model.Molde" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Peso Final (Gramos)</label>
+                        <input type="number" id="pesoFinal" class="form-control" value="@Model.PesoFinal" min="1" oninput="calcularTotal()" />
+                    </div>
+                </div>
+
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" id="esPublica" @(Model.EsPublica ? "checked" : "")>
+                    <label class="form-check-label fw-bold" for="esPublica">🌐 Compartir esta receta en la Comunidad pública</label>
+                </div>
+
+                <h5 class="fw-bold mb-3" style="color: #B76E5B;">Modificar Ingredientes</h5>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <select id="selectIngrediente" class="form-select">
+                            <option value="">-- Seleccionar Ingrediente --</option>
+                            @foreach (var ing in ingredientes)
+                            {
+                                <option value="@ing.Id" data-precio="@ing.PrecioCompra" data-presentacion="@ing.CantidadPresentacion" data-unidad="@ing.UnidadMedida">
+                                    @ing.Nombre (@ing.CantidadPresentacion @ing.UnidadMedida - C$ @ing.PrecioCompra)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" id="cantidadIngrediente" class="form-control" placeholder="Cantidad" min="0.1" step="0.1" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn text-white w-100 fw-bold" style="background-color: #6B2638;" onclick="agregarIngrediente()">+ Añadir</button>
+                    </div>
+                </div>
+
+                <table class="table table-bordered bg-white" id="tablaIngredientes">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ingrediente</th>
+                            <th>Cantidad</th>
+                            <th>Costo (C$)</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-4 text-white" style="background-color: #6B2638; border-radius: 12px;">
+                <h4 class="fw-bold mb-3">Resumen de Costos Actualizado</h4>
+                <hr class="border-light" />
+
+                <div class="d-flex justify-content-between mb-2 fs-5">
+                    <span>Costo Producción (NIO):</span>
+                    <strong id="costoNIO">C$ 0.00</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3 fs-6 text-light">
+                    <span>Equivalente USD (36.62):</span>
+                    <strong id="costoUSD">$ 0.00</strong>
+                </div>
+
+                <h5 class="fw-bold mt-4 mb-3" style="color: #F7EBDD;">Márgenes de Ganancia Sugeridos</h5>
+
+                <div class="p-2 mb-2 rounded bg-white text-dark d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="fw-bold text-muted d-block">CONSERVADOR (+10%)</small>
+                        <strong class="fs-6 text-success" id="precio10NIO">C$ 0.00</strong>
+                    </div>
+                    <span class="badge bg-light text-secondary border" id="precio10USD">$ 0.00</span>
+                </div>
+
+                <div class="p-2 mb-2 rounded text-dark d-flex justify-content-between align-items-center" style="background-color: #F7EBDD;">
+                    <div>
+                        <small class="fw-bold text-danger d-block">RECOMENDADO (+20%)</small>
+                        <strong class="fs-5 text-danger" id="precio20NIO">C$ 0.00</strong>
+                    </div>
+                    <span class="badge bg-white text-dark border" id="precio20USD">$ 0.00</span>
+                </div>
+
+                <div class="p-2 mb-3 rounded bg-white text-dark d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="fw-bold text-muted d-block">PREMIUM (+30%)</small>
+                        <strong class="fs-6 text-primary" id="precio30NIO">C$ 0.00</strong>
+                    </div>
+                    <span class="badge bg-light text-secondary border" id="precio30USD">$ 0.00</span>
+                </div>
+
+                <button type="button" class="btn btn-lg fw-bold text-dark w-100 mt-2" style="background-color: #F7EBDD;" onclick="actualizarRecetaCompleta()">
+                    💾 Guardar Cambios de Receta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let listaIngredientes = [];
+        const TASA_CAMBIO = 36.62;
+
+        // Cargar ingredientes existentes de la modelo al cargar la página
+        window.onload = function () {
+        @if (Model.Detalles != null)
+        {
+            foreach (var d in Model.Detalles)
+            {
+                <text>
+                        listaIngredientes.push({
+                            ingredienteId: @d.IngredienteId,
+                            nombre: "@(d.Ingrediente?.Nombre ?? "Ingrediente")",
+                            cantidad: @d.CantidadRequerida,
+                            costo: @(d.CantidadRequerida * (d.Ingrediente?.PrecioCompra ?? 0) / (d.Ingrediente?.CantidadPresentacion > 0 ? d.Ingrediente.CantidadPresentacion : 1))
+                                    });
+                </text>
+            }
+        }
+                renderizarTabla();
+        };
+
+        function agregarIngrediente() {
+            const select = document.getElementById("selectIngrediente");
+            const cantidadInput = document.getElementById("cantidadIngrediente");
+            const ingId = select.value;
+            const cantidad = parseFloat(cantidadInput.value);
+
+            if (!ingId || isNaN(cantidad) || cantidad <= 0) {
+                alert("Seleccione un ingrediente e ingrese una cantidad válida.");
+                return;
+            }
+
+            const option = select.options[select.selectedIndex];
+            const nombre = option.text.split('(')[0];
+            const precio = parseFloat(option.getAttribute("data-precio"));
+            const presentacion = parseFloat(option.getAttribute("data-presentacion"));
+            const costoUnitario = precio / presentacion;
+            const costoTotal = cantidad * costoUnitario;
+
+            listaIngredientes.push({
+                ingredienteId: parseInt(ingId),
+                nombre: nombre,
+                cantidad: cantidad,
+                costo: costoTotal
+            });
+
+            cantidadInput.value = "";
+            renderizarTabla();
+        }
+
+        function renderizarTabla() {
+            const tbody = document.querySelector("#tablaIngredientes tbody");
+            tbody.innerHTML = "";
+
+            listaIngredientes.forEach((item, index) => {
+                tbody.innerHTML += `
+                            <tr>
+                                <td>${item.nombre}</td>
+                                <td>${item.cantidad}</td>
+                                <td>C$ ${item.costo.toFixed(2)}</td>
+                                <td><button class="btn btn-sm btn-danger" onclick="eliminarIngrediente(${index})">X</button></td>
+                            </tr>
+                        `;
+            });
+
+            calcularTotal();
+        }
+
+        function eliminarIngrediente(index) {
+            listaIngredientes.splice(index, 1);
+            renderizarTabla();
+        }
+
+        function calcularTotal() {
+            const totalNIO = listaIngredientes.reduce((sum, item) => sum + item.costo, 0);
+            const totalUSD = totalNIO / TASA_CAMBIO;
+
+            document.getElementById("costoNIO").innerText = `C$ ${totalNIO.toFixed(2)}`;
+            document.getElementById("costoUSD").innerText = `$ ${totalUSD.toFixed(2)}`;
+
+            const p10NIO = totalNIO * 1.10;
+            const p20NIO = totalNIO * 1.20;
+            const p30NIO = totalNIO * 1.30;
+
+            document.getElementById("precio10NIO").innerText = `C$ ${p10NIO.toFixed(2)}`;
+            document.getElementById("precio10USD").innerText = `$ ${(p10NIO / TASA_CAMBIO).toFixed(2)}`;
+
+            document.getElementById("precio20NIO").innerText = `C$ ${p20NIO.toFixed(2)}`;
+            document.getElementById("precio20USD").innerText = `$ ${(p20NIO / TASA_CAMBIO).toFixed(2)}`;
+
+            document.getElementById("precio30NIO").innerText = `C$ ${p30NIO.toFixed(2)}`;
+            document.getElementById("precio30USD").innerText = `$ ${(p30NIO / TASA_CAMBIO).toFixed(2)}`;
+        }
+
+        async function actualizarRecetaCompleta() {
+            const id = parseInt(document.getElementById("recetaId").value);
+            const nombre = document.getElementById("nombreReceta").value;
+            const molde = document.getElementById("moldeReceta").value;
+            const pesoFinal = parseFloat(document.getElementById("pesoFinal").value) || 0;
+            const esPublica = document.getElementById("esPublica").checked;
+            const costoTotal = listaIngredientes.reduce((sum, item) => sum + item.costo, 0);
+
+            if (!nombre || listaIngredientes.length === 0) {
+                alert("Ingrese el nombre y al menos un ingrediente.");
+                return;
+            }
+
+            const payload = {
+                id: id,
+                nombre: nombre,
+                molde: molde,
+                pesoFinal: pesoFinal,
+                costoTotalProduccion: costoTotal,
+                esPublica: esPublica,
+                ingredientes: listaIngredientes.map(i => ({ ingredienteId: i.ingredienteId, cantidad: i.cantidad }))
+            };
+
+            const response = await fetch('/Recetas/ActualizarReceta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                window.location.href = '/Recetas/MisRecetas';
+            } else {
+                alert(data.message);
+            }
+        }
+    </script>
+}

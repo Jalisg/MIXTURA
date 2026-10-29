@@ -1,0 +1,255 @@
+﻿@{
+    ViewData["Title"] = "Crear Receta y Calcular Costos";
+    var ingredientes = ViewBag.Ingredientes as List<MIXTURAA.Models.Ingrediente> ?? new List<MIXTURAA.Models.Ingrediente>();
+}
+
+<div class="container py-4">
+    <h2 class="fw-bold mb-4" style="color: #6B2638;">🧁 CÁLCULO DE COSTOS Y NUEVA RECETA</h2>
+
+    <div class="row g-4">
+        <!-- Formulario de Parámetros -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm p-4" style="background-color: #FFF9F2;">
+                <h5 class="fw-bold mb-3" style="color: #B76E5B;">Parámetros Básicos</h5>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nombre de la Receta</label>
+                    <input type="text" id="nombreReceta" class="form-control" placeholder="Ej. Pastel de Vainilla y Fresa" />
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Molde / Presentación</label>
+                        <input type="text" id="moldeReceta" class="form-control" placeholder="Ej. Circular 22cm" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Peso Final (Gramos)</label>
+                        <input type="number" id="pesoFinal" class="form-control" value="1000" min="1" oninput="calcularTotal()" />
+                    </div>
+                </div>
+
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" id="esPublica">
+                    <label class="form-check-label fw-bold" for="esPublica">🌐 Compartir esta receta en la Comunidad pública</label>
+                </div>
+
+                <h5 class="fw-bold mb-3" style="color: #B76E5B;">Ingredientes Requeridos</h5>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <select id="selectIngrediente" class="form-select">
+                            <option value="">-- Seleccionar Ingrediente --</option>
+                            @foreach (var ing in ingredientes)
+                            {
+                                <option value="@ing.Id" data-precio="@ing.PrecioCompra" data-presentacion="@ing.CantidadPresentacion" data-unidad="@ing.UnidadMedida">
+                                    @ing.Nombre (@ing.CantidadPresentacion @ing.UnidadMedida - C$ @ing.PrecioCompra)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="number" id="cantidadIngrediente" class="form-control" placeholder="Cantidad" min="0.1" step="0.1" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn text-white w-100 fw-bold" style="background-color: #6B2638;" onclick="agregarIngrediente()">+ Añadir</button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Lista de Ingredientes -->
+                <table class="table table-bordered bg-white" id="tablaIngredientes">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Ingrediente</th>
+                            <th>Cantidad</th>
+                            <th>Costo (C$)</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Panel de Resultados de Costos y Márgenes de Ganancia -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm p-4 text-white" style="background-color: #6B2638; border-radius: 12px;">
+                <h4 class="fw-bold mb-3">Resumen de Costos</h4>
+                <hr class="border-light" />
+
+                <div class="d-flex justify-content-between mb-2 fs-5">
+                    <span>Costo Producción (NIO):</span>
+                    <strong id="costoNIO">C$ 0.00</strong>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3 fs-6 text-light">
+                    <span>Equivalente USD (Tasa 36.62):</span>
+                    <strong id="costoUSD">$ 0.00</strong>
+                </div>
+
+                <h5 class="fw-bold mt-4 mb-3" style="color: #F7EBDD;">Escenarios de Precio Sugerido</h5>
+
+                <!-- Escenario Conservador (+10%) -->
+                <div class="p-2 mb-2 rounded bg-white text-dark d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="fw-bold text-muted d-block">CONSERVADOR (+10%)</small>
+                        <strong class="fs-6 text-success" id="precio10NIO">C$ 0.00</strong>
+                    </div>
+                    <span class="badge bg-light text-secondary border" id="precio10USD">$ 0.00</span>
+                </div>
+
+                <!-- Escenario Recomendado (+20%) -->
+                <div class="p-2 mb-2 rounded text-dark d-flex justify-content-between align-items-center" style="background-color: #F7EBDD;">
+                    <div>
+                        <small class="fw-bold text-danger d-block">RECOMENDADO (+20%)</small>
+                        <strong class="fs-5 text-danger" id="precio20NIO">C$ 0.00</strong>
+                    </div>
+                    <span class="badge bg-white text-dark border" id="precio20USD">$ 0.00</span>
+                </div>
+
+                <!-- Escenario Premium (+30%) -->
+                <div class="p-2 mb-3 rounded bg-white text-dark d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="fw-bold text-muted d-block">PREMIUM (+30%)</small>
+                        <strong class="fs-6 text-primary" id="precio30NIO">C$ 0.00</strong>
+                    </div>
+                    <span class="badge bg-light text-secondary border" id="precio30USD">$ 0.00</span>
+                </div>
+
+                <button type="button" class="btn btn-lg fw-bold text-dark w-100 mt-2" style="background-color: #F7EBDD;" onclick="guardarRecetaCompleta()">
+                    💾 Guardar Receta
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let listaIngredientes = [];
+        const TASA_CAMBIO = 36.62;
+
+        function agregarIngrediente() {
+            const select = document.getElementById("selectIngrediente");
+            const cantidadInput = document.getElementById("cantidadIngrediente");
+            const ingId = select.value;
+            const cantidad = parseFloat(cantidadInput.value);
+
+            if (!ingId || isNaN(cantidad) || cantidad <= 0) {
+                alert("Seleccione un ingrediente e ingrese una cantidad válida.");
+                return;
+            }
+
+            const option = select.options[select.selectedIndex];
+            const nombre = option.text.split('(')[0];
+            const precio = parseFloat(option.getAttribute("data-precio"));
+            const presentacion = parseFloat(option.getAttribute("data-presentacion"));
+            const costoUnitario = precio / presentacion;
+            const costoTotal = cantidad * costoUnitario;
+
+            listaIngredientes.push({
+                ingredienteId: parseInt(ingId),
+                nombre: nombre,
+                cantidad: cantidad,
+                costo: costoTotal
+            });
+
+            cantidadInput.value = "";
+            renderizarTabla();
+        }
+
+        function renderizarTabla() {
+            const tbody = document.querySelector("#tablaIngredientes tbody");
+            tbody.innerHTML = "";
+
+            listaIngredientes.forEach((item, index) => {
+                tbody.innerHTML += `
+                            <tr>
+                                <td>${item.nombre}</td>
+                                <td>${item.cantidad}</td>
+                                <td>C$ ${item.costo.toFixed(2)}</td>
+                                <td><button class="btn btn-sm btn-danger" onclick="eliminarIngrediente(${index})">X</button></td>
+                            </tr>
+                        `;
+            });
+
+            calcularTotal();
+        }
+
+        function eliminarIngrediente(index) {
+            listaIngredientes.splice(index, 1);
+            renderizarTabla();
+        }
+
+        function calcularTotal() {
+            const totalNIO = listaIngredientes.reduce((sum, item) => sum + item.costo, 0);
+            const totalUSD = totalNIO / TASA_CAMBIO;
+
+            // Totales de costo base
+            document.getElementById("costoNIO").innerText = `C$ ${totalNIO.toFixed(2)}`;
+            document.getElementById("costoUSD").innerText = `$ ${totalUSD.toFixed(2)}`;
+
+            // Cálculo de escenarios (+10%, +20%, +30%)
+            const p10NIO = totalNIO * 1.10;
+            const p10USD = p10NIO / TASA_CAMBIO;
+
+            const p20NIO = totalNIO * 1.20;
+            const p20USD = p20NIO / TASA_CAMBIO;
+
+            const p30NIO = totalNIO * 1.30;
+            const p30USD = p30NIO / TASA_CAMBIO;
+
+            // Renderizado de márgenes
+            document.getElementById("precio10NIO").innerText = `C$ ${p10NIO.toFixed(2)}`;
+            document.getElementById("precio10USD").innerText = `$ ${p10USD.toFixed(2)}`;
+
+            document.getElementById("precio20NIO").innerText = `C$ ${p20NIO.toFixed(2)}`;
+            document.getElementById("precio20USD").innerText = `$ ${p20USD.toFixed(2)}`;
+
+            document.getElementById("precio30NIO").innerText = `C$ ${p30NIO.toFixed(2)}`;
+            document.getElementById("precio30USD").innerText = `$ ${p30USD.toFixed(2)}`;
+        }
+
+        async function guardarRecetaCompleta() {
+            const nombre = document.getElementById("nombreReceta").value;
+            const molde = document.getElementById("moldeReceta").value;
+            const pesoFinal = parseFloat(document.getElementById("pesoFinal").value) || 0;
+            const esPublica = document.getElementById("esPublica").checked;
+            const costoTotal = listaIngredientes.reduce((sum, item) => sum + item.costo, 0);
+
+            if (!nombre) {
+                alert("Ingrese el nombre de la receta.");
+                return;
+            }
+
+            if (listaIngredientes.length === 0) {
+                alert("Debe agregar al menos un ingrediente a la receta.");
+                return;
+            }
+
+            const payload = {
+                nombre: nombre,
+                molde: molde,
+                pesoFinal: pesoFinal,
+                costoTotalProduccion: costoTotal,
+                esPublica: esPublica,
+                ingredientes: listaIngredientes.map(i => ({ ingredienteId: i.ingredienteId, cantidad: i.cantidad }))
+            };
+
+            const response = await fetch('/Recetas/GuardarReceta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                alert(data.message);
+                window.location.href = esPublica ? '/Recetas/Comunidad' : '/Recetas/MisRecetas';
+            } else {
+                alert(data.message);
+            }
+        }
+    </script>
+}

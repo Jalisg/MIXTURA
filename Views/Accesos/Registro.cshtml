@@ -1,0 +1,118 @@
+﻿@model MIXTURAA.Models.Usuario
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crear Cuenta - MIXTURA</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root {
+            --bg-burgundy: #581c24;
+            --bg-creme-bg: #f8f3eb;
+            --bg-card-creme: #f5ebe0;
+            --btn-terracotta: #b8624d;
+            --text-dark: #2b2b2b;
+        }
+
+        body {
+            background-color: var(--bg-creme-bg);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+        }
+
+        .left-banner {
+            background-color: var(--bg-burgundy);
+            color: white;
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .right-content {
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .card-login {
+            background-color: var(--bg-card-creme);
+            border: 1px solid #e6d5c3;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-terracotta {
+            background-color: var(--btn-terracotta);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .form-control-creme {
+            background-color: #ebdcd0;
+            border: 1px solid #d8c3b3;
+            border-radius: 8px;
+            padding: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-banner">
+        <h1 class="display-3 fw-bold mb-3">MIXTURA</h1>
+        <p class="fs-5 text-light opacity-75 mb-0">Crea tu cuenta e inicia a gestionar tus recetas</p>
+    </div>
+
+    <div class="right-content">
+        <div class="card-login">
+            <h2 class="fw-bold text-dark mb-2">Crear Cuenta</h2>
+            <p class="text-muted mb-4">Ingresa tus datos para registrarte en el sistema</p>
+
+            <form asp-action="Registro" method="post">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Nombre Completo</label>
+                    <input asp-for="NombreCompleto" class="form-control form-control-creme" placeholder="ej. María López" required />
+                    <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Correo Electrónico</label>
+                    <input asp-for="Correo" type="email" class="form-control form-control-creme" placeholder="ejemplo@mixtura.com" required />
+                    <span asp-validation-for="Correo" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Contraseña</label>
+                    <input asp-for="Contrasena" type="password" class="form-control form-control-creme" placeholder="••••••••" required />
+                    <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-terracotta fs-6 mb-3">Registrarse &rarr;</button>
+
+                <div class="text-center">
+                    <a asp-action="Login" class="text-decoration-none small" style="color: var(--bg-burgundy);">¿Ya tienes cuenta? Inicia sesión aquí</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

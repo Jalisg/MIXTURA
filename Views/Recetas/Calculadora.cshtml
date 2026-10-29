@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "Cálculo de Costos y Precios";
+}
+
+<h2 class="fw-bold mb-4">CÁLCULO DE COSTOS Y PRECIOS</h2>
+
+<div class="row g-4">
+    <!-- Columna Izquierda -->
+    <div class="col-md-6">
+        <div class="card-creme">
+            <h5 class="fw-bold mb-3">PARÁMETROS DE HORNADA</h5>
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Molde</label>
+                <select class="form-select form-control-creme">
+                    <option selected>Circular 22 cm</option>
+                    <option>Rectangular 30 cm</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Peso Final</label>
+                <input type="text" class="form-control form-control-creme" value="1500 g">
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Unidades</label>
+                <input type="number" id="unidades" class="form-control form-control-creme" value="1" oninput="recalcular()">
+            </div>
+        </div>
+
+        <div class="card-creme">
+            <h5 class="fw-bold mb-3">COSTOS OPERATIVOS</h5>
+            <div class="d-flex justify-content-between mb-2"><span>Mano de Obra</span><span class="fw-bold">$5.00</span></div>
+            <div class="d-flex justify-content-between mb-2"><span>Energía</span><span class="fw-bold">$3.20</span></div>
+            <div class="d-flex justify-content-between mb-2"><span>Mermas</span><span class="fw-bold">$2.50</span></div>
+            <div class="d-flex justify-content-between"><span>Transporte</span><span class="fw-bold">$1.50</span></div>
+        </div>
+    </div>
+
+    <!-- Columna Derecha -->
+    <div class="col-md-6">
+        <div class="card-creme text-center py-4" style="background-color: #ebdcd0;">
+            <span class="fw-bold text-uppercase fs-6">Costo Total Producción:</span>
+            <h1 class="display-4 fw-bold my-1" id="costoTotal">$18.70</h1>
+        </div>
+
+        <h5 class="fw-bold my-3">3 ESCENARIOS DE GANANCIA</h5>
+
+        <div class="card-creme py-2 mb-2">
+            <span class="fw-bold">CONSERVADOR (30% Margen)</span>
+            <div>&rarr; Precio: <b id="p30">$24.31</b></div>
+            <div>Ganancia: <span id="g30" class="text-success">$5.61</span></div>
+        </div>
+
+        <div class="card-creme py-2 mb-2 border-danger" style="border-width: 2px !important;">
+            <span class="fw-bold">RECOMENDADO (50% Margen)</span>
+            <div>&rarr; Precio: <b id="p50">$28.05</b></div>
+            <div>Ganancia: <span id="g50" class="text-success">$9.35</span></div>
+        </div>
+
+        <div class="card-creme py-2 mb-3">
+            <span class="fw-bold">PREMIUM (70% Margen)</span>
+            <div>&rarr; Precio: <b id="p70">$31.79</b></div>
+            <div>Ganancia: <span id="g70" class="text-success">$13.09</span></div>
+        </div>
+
+        <a asp-action="Crear" class="btn btn-burgundy w-100 py-3 fs-5 text-center d-block text-decoration-none">Guardar en Mis Recetas</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const TASA_BCCN = 36.62; // Tipo de cambio Banco Central de Nicaragua
+        let monedaActual = "NIO"; // Por defecto en Córdobas
+
+        function recalcular() {
+            let unidades = parseInt(document.getElementById("unidades").value) || 1;
+
+            // Base en USD
+            let baseUSD = 18.70 * unidades;
+
+            // Aplicar conversión si la moneda es Córdobas (NIO)
+            let factor = (monedaActual === "NIO") ? TASA_BCCN : 1;
+            let simbolo = (monedaActual === "NIO") ? "C$" : "$";
+
+            let total = baseUSD * factor;
+
+            document.getElementById("costoTotal").innerText = simbolo + total.toFixed(2);
+
+            // Escenario Conservador (30%)
+            document.getElementById("p30").innerText = simbolo + (total * 1.30).toFixed(2);
+            document.getElementById("g30").innerText = simbolo + (total * 0.30).toFixed(2);
+
+            // Escenario Recomendado (50%)
+            document.getElementById("p50").innerText = simbolo + (total * 1.50).toFixed(2);
+            document.getElementById("g50").innerText = simbolo + (total * 0.50).toFixed(2);
+
+            // Escenario Premium (70%)
+            document.getElementById("p70").innerText = simbolo + (total * 1.70).toFixed(2);
+            document.getElementById("g70").innerText = simbolo + (total * 0.70).toFixed(2);
+        }
+
+        function cambiarMonedaGlobal() {
+            monedaActual = document.getElementById("selectMonedaGlobal").value;
+            recalcular();
+        }
+
+        // Inicializar cálculo
+        document.addEventListener("DOMContentLoaded", function () {
+            recalcular();
+        });
+    </script>
+}

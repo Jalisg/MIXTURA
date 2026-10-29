@@ -1,0 +1,80 @@
+﻿@model IEnumerable<MIXTURAA.Models.Receta>
+
+@{
+    ViewData["Title"] = "Comunidad de Reposteros";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark m-0" style="color: #6B2638;">🌐 COMUNIDAD DE REPOSTEROS</h2>
+            <p class="text-muted mb-0">Explora e inspírate con las fórmulas públicas compartidas por otros reposteros.</p>
+        </div>
+        <a asp-action="Crear" class="btn text-white fw-bold" style="background-color: #B76E5B;">
+            + Compartir una Receta
+        </a>
+    </div>
+
+    <!-- Buscador -->
+    <form method="get" asp-action="Comunidad" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="buscar" value="@ViewBag.BusquedaActual" class="form-control" placeholder="Buscar receta por nombre (ej. Pastel de Vainilla)..." />
+            <button class="btn text-white" type="submit" style="background-color: #6B2638;">
+                🔍 Buscar
+            </button>
+            @if (!string.IsNullOrEmpty(ViewBag.BusquedaActual as string))
+            {
+                <a asp-action="Comunidad" class="btn btn-outline-secondary">Limpiar</a>
+            }
+        </div>
+    </form>
+
+    <!-- Tarjetas de Recetas Públicas -->
+    @if (!Model.Any())
+    {
+        <div class="card text-center py-5 border-0 shadow-sm" style="background-color: #FFF9F2;">
+            <div class="card-body">
+                <h5 class="text-muted">No se encontraron recetas públicas en la comunidad.</h5>
+                <p class="small text-muted">¡Sé el primero en compartir tu fórmula con la comunidad!</p>
+                <a asp-action="Crear" class="btn text-white mt-2" style="background-color: #6B2638;">Crear Receta Pública</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var receta in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm d-flex flex-column justify-content-between" style="background-color: #FFF9F2; border-radius: 12px;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-success small">🌐 Pública</span>
+                                <small class="text-muted fw-bold">
+                                    👤 @(receta.Creador?.Correo ?? "Repostero Anónimo")
+                                </small>
+                            </div>
+
+                            <h5 class="fw-bold mb-2" style="color: #6B2638;">@receta.Nombre</h5>
+
+                            <div class="small text-secondary mb-3">
+                                @if (!string.IsNullOrEmpty(receta.Molde))
+                                {
+                                    <div><strong>Molde:</strong> @receta.Molde</div>
+                                }
+                                <div><strong>Peso Final:</strong> @receta.PesoFinal g</div>
+                                <div><strong>Ingredientes:</strong> @(receta.Detalles?.Count ?? 0) registrados</div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0 pt-0 pb-3">
+                            <a asp-action="DetalleComunidad" asp-route-id="@receta.Id" class="btn btn-sm w-100 fw-bold border-0 text-white" style="background-color: #6B2638;">
+                                Ver Fórmula Completa 📖
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,67 @@
+﻿@model MIXTURAA.Models.Receta
+
+@{
+    ViewData["Title"] = "Detalle de Receta - " + Model.Nombre;
+}
+
+<div class="container py-4">
+    <div class="mb-3">
+        <a asp-action="Comunidad" class="btn btn-sm btn-outline-secondary">← Volver a la Comunidad</a>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="background-color: #FFF9F2; border-radius: 12px;">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="fw-bold m-0" style="color: #6B2638;">@Model.Nombre</h2>
+                <span class="badge bg-success px-3 py-2">🌐 Receta Pública</span>
+            </div>
+
+            <p class="text-muted small">
+                Compartido por: <strong>@(Model.Creador?.Correo ?? "Repostero Anónimo")</strong>
+            </p>
+
+            <div class="row g-3 my-2 p-3 bg-white rounded border">
+                <div class="col-md-4">
+                    <strong>Molde:</strong> @(string.IsNullOrEmpty(Model.Molde) ? "No especificado" : Model.Molde)
+                </div>
+                <div class="col-md-4">
+                    <strong>Peso Final:</strong> @Model.PesoFinal g
+                </div>
+                <div class="col-md-4">
+                    <strong>Costo Aprox. Producción:</strong> C$ @Model.CostoTotalProduccion.ToString("N2")
+                </div>
+            </div>
+
+            <h5 class="fw-bold mt-4 mb-3" style="color: #B76E5B;">Ingredientes y Cantidades Requeridas:</h5>
+
+            <table class="table table-hover bg-white rounded">
+                <thead style="background-color: #6B2638; color: white;">
+                    <tr>
+                        <th>Ingrediente</th>
+                        <th>Cantidad Requerida</th>
+                        <th>Unidad de Medida</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Detalles != null && Model.Detalles.Any())
+                    {
+                        @foreach (var detalle in Model.Detalles)
+                        {
+                            <tr>
+                                <td class="fw-bold text-dark">@(detalle.Ingrediente?.Nombre ?? "Ingrediente descontinuado")</td>
+                                <td>@detalle.CantidadRequerida.ToString("N2")</td>
+                                <td>@(detalle.Ingrediente?.UnidadMedida ?? "u")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Esta receta no tiene ingredientes registrados.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+﻿@model IEnumerable<MIXTURAA.Models.Receta>
+
+@{
+    ViewData["Title"] = "Mis Recetas Guardadas";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold text-dark m-0" style="color: #6B2638;">🔒 MIS RECETAS GUARDADAS</h2>
+            <p class="text-muted mb-0">Gestión privada de tus fórmulas y costos de producción.</p>
+        </div>
+        <a asp-action="Crear" class="btn text-white fw-bold" style="background-color: #B76E5B;">
+            + Nueva Receta / Calcular Costos
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card text-center py-5 border-0 shadow-sm" style="background-color: #FFF9F2;">
+            <div class="card-body">
+                <h5 class="text-muted">Aún no tienes recetas personales guardadas.</h5>
+                <p class="small text-muted">Haz clic en el botón superior para crear y costear tu primera receta.</p>
+                <a asp-action="Crear" class="btn text-white mt-2" style="background-color: #6B2638;">Crear Receta Ahora</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var receta in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm d-flex flex-column justify-content-between" style="background-color: #FFF9F2; border-radius: 12px;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                @if (receta.EsPublica)
+                                {
+                                    <span class="badge bg-success small">🌐 Pública</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary small">🔒 Privada</span>
+                                }
+                                <span class="fw-bold text-dark fs-6">C$ @receta.CostoTotalProduccion.ToString("N2")</span>
+                            </div>
+
+                            <h5 class="fw-bold mb-2" style="color: #6B2638;">@receta.Nombre</h5>
+
+                            <div class="small text-secondary mb-3">
+                                @if (!string.IsNullOrEmpty(receta.Molde))
+                                {
+                                    <div><strong>Molde:</strong> @receta.Molde</div>
+                                }
+                                <div><strong>Peso Final:</strong> @receta.PesoFinal g</div>
+                                <div><strong>Ingredientes:</strong> @(receta.Detalles?.Count ?? 0) registrados</div>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-transparent border-top-0 pt-0 pb-3 d-flex gap-2">
+                            <a asp-action="Editar" asp-route-id="@receta.Id" class="btn btn-sm w-50 fw-bold text-white" style="background-color: #6B2638;">
+                                Editar ✏️
+                            </a>
+                            <a asp-action="Eliminar" asp-route-id="@receta.Id" class="btn btn-sm w-50 fw-bold btn-danger">
+                                Eliminar 🗑️
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,126 @@
+﻿@model MIXTURAA.Models.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iniciar Sesión - MIXTURA</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root {
+            --bg-burgundy: #581c24;
+            --bg-creme-bg: #f8f3eb;
+            --bg-card-creme: #f5ebe0;
+            --btn-terracotta: #b8624d;
+            --text-dark: #2b2b2b;
+        }
+
+        body {
+            background-color: var(--bg-creme-bg);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+        }
+
+        .left-banner {
+            background-color: var(--bg-burgundy);
+            color: white;
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .cake-logo {
+            width: 90px;
+            height: 90px;
+            fill: #f5ebe0;
+            margin-bottom: 15px;
+        }
+
+        .right-content {
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .card-login {
+            background-color: var(--bg-card-creme);
+            border: 1px solid #e6d5c3;
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-terracotta {
+            background-color: var(--btn-terracotta);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .form-control-creme {
+            background-color: #ebdcd0;
+            border: 1px solid #d8c3b3;
+            border-radius: 8px;
+            padding: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="left-banner">
+        <!-- Logo de Pastel (SVG) -->
+        <svg class="cake-logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm-4 4a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zm8 0a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V7a1 1 0 0 1 1-1zM4 11a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1v4a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-4H4a2 2 0 0 1-2-2v-2zm2 0v2h12v-2H6zm1 4v4h10v-4H7z" />
+        </svg>
+
+        <h1 class="display-3 fw-bold mb-2">MIXTURA</h1>
+        <p class="fs-5 text-light opacity-75 mb-0">Cálculo de costos y precios para repostería</p>
+    </div>
+
+    <div class="right-content">
+        <div class="card-login">
+            <h2 class="fw-bold text-dark mb-2">Iniciar Sesión</h2>
+            <p class="text-muted mb-4">Ingresa tus credenciales para acceder al sistema</p>
+
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Correo Electrónico</label>
+                    <input asp-for="Correo" type="email" class="form-control form-control-creme" placeholder="ejemplo@mixtura.com" required />
+                    <span asp-validation-for="Correo" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Contraseña</label>
+                    <input asp-for="Contrasena" type="password" class="form-control form-control-creme" placeholder="••••••••" required />
+                    <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                </div>
+
+                <button type="submit" class="btn btn-terracotta fs-6 mb-3">Ingresar al Sistema &rarr;</button>
+
+                <div class="text-center">
+                    <a asp-action="Registro" class="text-decoration-none small" style="color: var(--bg-burgundy);">¿No tienes cuenta? Regístrate aquí</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

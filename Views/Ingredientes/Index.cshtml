@@ -1,0 +1,67 @@
+﻿@model IEnumerable<MIXTURAA.Models.Ingrediente>
+
+@{
+    ViewData["Title"] = "Catálogo de Insumos";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0" style="color: #6B2638;">🧂 CATÁLOGO DE INSUMOS</h2>
+            <p class="text-muted mb-0">Gestión de materias primas y cálculo de costo unitario.</p>
+        </div>
+        <a asp-action="Create" class="btn text-white fw-bold" style="background-color: #B76E5B;">
+            + Nuevo Insumo
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm" style="background-color: #FFF9F2; border-radius: 12px;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle m-0">
+                    <thead style="background-color: #6B2638; color: white;">
+                        <tr>
+                            <th class="ps-3">Nombre</th>
+                            <th>Presentación</th>
+                            <th>Unidad</th>
+                            <th>Precio Compra (C$)</th>
+                            <th>Costo Unitario (C$)</th>
+                            <th class="text-end pe-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    No hay insumos registrados. ¡Haz clic en "+ Nuevo Insumo" para agregar el primero!
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="ps-3 fw-bold text-dark">@item.Nombre</td>
+                                    <td>@item.CantidadPresentacion.ToString("N2")</td>
+                                    <td>@item.UnidadMedida</td>
+                                    <td>C$ @item.PrecioCompra.ToString("N2")</td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">
+                                            C$ @item.CostoPorUnidad.ToString("N4") / @item.UnidadMedida
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-3">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm text-white fw-bold" style="background-color: #6B2638;">Editar ✏️</a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger fw-bold">Eliminar 🗑️</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

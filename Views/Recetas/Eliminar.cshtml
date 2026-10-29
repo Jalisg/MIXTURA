@@ -1,0 +1,30 @@
+﻿@model MIXTURAA.Models.Receta
+
+@{
+    ViewData["Title"] = "Eliminar Receta";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
+                <h3 class="fw-bold text-danger mb-3">🗑️ ¿ELIMINAR RECETA?</h3>
+                <p class="text-muted">¿Estás seguro de que deseas eliminar permanentemente esta receta y su desglose de costos?</p>
+
+                <div class="p-3 mb-4 rounded" style="background-color: #FFF9F2;">
+                    <div><strong>Nombre:</strong> @Model.Nombre</div>
+                    <div><strong>Molde:</strong> @(string.IsNullOrEmpty(Model.Molde) ? "N/A" : Model.Molde)</div>
+                    <div><strong>Costo Producción:</strong> C$ @Model.CostoTotalProduccion.ToString("N2")</div>
+                </div>
+
+                <form asp-action="EliminarConfirmado">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="MisRecetas" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-danger fw-bold">Sí, Eliminar Receta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
