@@ -1,0 +1,141 @@
+﻿@model MIXTURAA.Models.Receta
+
+@{
+    ViewData["Title"] = "Detalle de Receta";
+
+    // Escenarios de margen de ganancia
+    decimal costoBase = Model.CostoTotalProduccion;
+    decimal precio10 = costoBase * 1.10m;
+    decimal precio20 = costoBase * 1.20m;
+    decimal precio30 = costoBase * 1.30m;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: #6B2638;">🍰 @Model.Nombre</h2>
+            <p class="text-muted mb-0">Detalle completo de formulación e insumos</p>
+        </div>
+        <a asp-action="MisRecetas" class="btn btn-outline-secondary">← Volver a Mis Recetas</a>
+    </div>
+
+    <div class="row">
+        <!-- Columna Izquierda: Información de Receta e Ingredientes -->
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-dark">📋 Información y Fórmula</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <strong>Molde:</strong> 
+                            <span class="text-secondary">@(string.IsNullOrEmpty(Model.Molde) ? "No especificado" : Model.Molde)</span>
+                        </div>
+                        <div class="col-6">
+                            <strong>Peso Final:</strong> 
+                            <span class="text-secondary">@Model.PesoFinal.ToString("N2") g</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Visibilidad:</strong> 
+                        @if (Model.EsPublica)
+                        {
+                            <span class="badge bg-success">🌐 Pública</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">🔒 Privada</span>
+                        }
+                    </div>
+
+                    <hr />
+
+                    <h6 class="fw-bold mb-3">🧈 Desglose de Insumos Registrados:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ingrediente</th>
+                                    <th class="text-end">Cantidad Requerida</th>
+                                    <th class="text-end">Unidad</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Detalles != null && Model.Detalles.Any())
+                                {
+                                    @foreach (var detalle in Model.Detalles)
+                                    {
+                                        <tr>
+                                            <td class="fw-semibold">@detalle.Ingrediente?.Nombre</td>
+                                            <td class="text-end">@detalle.CantidadRequerida.ToString("N2")</td>
+                                            <td class="text-end"><span class="badge bg-light text-dark border">@detalle.Ingrediente?.UnidadMedida</span></td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted py-3">No hay ingredientes asociados a esta receta.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Costo Total y Márgenes de Ganancia -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 rounded-3" style="background-color: #FFF9F2;">
+                <div class="card-body p-4">
+                    <h6 class="text-uppercase text-muted fw-bold mb-1">Costo Base de Producción</h6>
+                    <h1 class="fw-bold text-success display-6 mb-3">C$ @Model.CostoTotalProduccion.ToString("N2")</h1>
+                    
+                    <hr class="my-3" />
+
+                    <h6 class="fw-bold mb-3 text-dark">📈 Escenarios de Margen de Ganancia:</h6>
+
+                    <!-- Escenario 10% -->
+                    <div class="p-3 mb-2 bg-white rounded border border-info shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-info fw-bold">Conservador (+10%)</small>
+                                <span class="d-block text-muted fs-7">Ganancia: C$ @((precio10 - costoBase).ToString("N2"))</span>
+                            </div>
+                            <h4 class="fw-bold text-info mb-0">C$ @precio10.ToString("N2")</h4>
+                        </div>
+                    </div>
+
+                    <!-- Escenario 20% -->
+                    <div class="p-3 mb-2 bg-white rounded border border-success shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-success fw-bold">Recomendado (+20%)</small>
+                                <span class="d-block text-muted fs-7">Ganancia: C$ @((precio20 - costoBase).ToString("N2"))</span>
+                            </div>
+                            <h4 class="fw-bold text-success mb-0">C$ @precio20.ToString("N2")</h4>
+                        </div>
+                    </div>
+
+                    <!-- Escenario 30% -->
+                    <div class="p-3 mb-4 bg-white rounded border border-warning shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-warning fw-bold">Premium (+30%)</small>
+                                <span class="d-block text-muted fs-7">Ganancia: C$ @((precio30 - costoBase).ToString("N2"))</span>
+                            </div>
+                            <h4 class="fw-bold text-warning mb-0">C$ @precio30.ToString("N2")</h4>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a asp-action="Editar" asp-route-id="@Model.Id" class="btn text-white py-2 fw-bold" style="background-color: #6B2638;">Editar Receta ✏️</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

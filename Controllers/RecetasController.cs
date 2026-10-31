@@ -33,6 +33,28 @@ namespace MIXTURAA.Controllers
             return View(misRecetas);
         }
 
+        // GET: Recetas/Detalle/5
+        public async Task<IActionResult> Detalle(int id)
+        {
+            int? usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null)
+            {
+                return RedirectToAction("Login", "Accesos");
+            }
+
+            var receta = await _context.Recetas
+                .Include(r => r.Detalles)
+                    .ThenInclude(d => d.Ingrediente)
+                .FirstOrDefaultAsync(r => r.Id == id && r.UsuarioId == usuarioId);
+
+            if (receta == null)
+            {
+                return NotFound();
+            }
+
+            return View(receta);
+        }
+
         // GET: Recetas/Comunidad
         public async Task<IActionResult> Comunidad(string? buscar)
         {
