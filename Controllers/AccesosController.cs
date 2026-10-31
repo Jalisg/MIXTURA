@@ -31,7 +31,7 @@ namespace MIXTURAA.Controllers
 
                 if (usuario != null)
                 {
-                    // Se guarda la sesión activa del usuario para autenticación
+                    // Guardar la sesión activa del usuario
                     HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
 
                     return RedirectToAction("Index", "Ingredientes");
@@ -41,6 +41,37 @@ namespace MIXTURAA.Controllers
             }
 
             return View(model);
+        }
+
+        // GET: Accesos/Registro
+        [HttpGet]
+        public IActionResult Registro()
+        {
+            return View();
+        }
+
+        // POST: Accesos/Registro
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Registro(Usuario usuario)
+        {
+            if (ModelState.IsValid)
+            {
+                // Verificar si el correo ya existe
+                var existeCorreo = await _context.Usuarios.AnyAsync(u => u.Correo == usuario.Correo);
+                if (existeCorreo)
+                {
+                    ModelState.AddModelError("Correo", "El correo ya se encuentra registrado.");
+                    return View(usuario);
+                }
+
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("Login");
+            }
+
+            return View(usuario);
         }
 
         // GET: Accesos/Logout
